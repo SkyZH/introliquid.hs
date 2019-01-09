@@ -2,23 +2,10 @@ module Lib
     ( someFunc
     ) where
 
+import Language.Haskell.Liquid.Prelude
+
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
-
-{-@ (==>) :: p:Bool -> q:Bool -> {v:Bool | v <=> (p ==> q)} @-} 
-False ==> False = True 
-False ==> True = True 
-True ==> True = True 
-True ==> False = False
-
-{-@ (<=>) :: p:Bool -> q:Bool -> {v:Bool | v <=> (p <=> q)} @-} 
-False <=> False = True 
-False <=> True = False 
-True <=> True = True 
-True <=> False = False
-
-{-@ type TRUE  = {v:Bool | v     } @-}
-{-@ type FALSE = {v:Bool | not v } @-}
 
 {-@ ex0 :: TRUE @-}
 ex0 = True
@@ -42,3 +29,36 @@ ex4 a b = (a && b) ==> b
 {-@ ex3' :: Bool -> Bool -> TRUE @-}
 ex3' a b = a ==> a || b
 
+{-@ ex6 :: Bool -> Bool -> TRUE @-}
+ex6 a b = (a && (a ==> b)) ==> b
+
+{-@ ex7 :: Bool -> Bool -> TRUE @-}
+ex7 a b = a ==> (a ==> b) ==> b
+
+{-@ exDeMorgan1 :: Bool -> Bool -> TRUE @-}
+exDeMorgan1 a b = not (a || b) <=> (not a && not b)
+
+-- Exercise 2.2
+{-@ exDeMorgan2 :: Bool -> Bool -> TRUE @-}
+exDeMorgan2 a b = not (a && b) <=> (not a || not b)
+
+{-@ ax0 :: TRUE @-}
+ax0 = 1 + 1 == 2
+
+{-@ ax1 :: Int -> TRUE @-}
+ax1 :: Int -> Bool
+ax1 x = x < x + 1
+
+{-@ ax2 :: Int -> TRUE @-}
+ax2 :: Int -> Bool
+ax2 x = (x < 0) ==> (0 <= 0 - x)
+
+{-@ ax3 :: Int -> Int -> TRUE @-}
+ax3 :: Int -> Int -> Bool
+ax3 x y = (0 <= x) ==> (0 <= y) ==> (0 <= x + y)
+
+{-@ ax4 :: Int -> Int -> TRUE @-}
+ax4 x y = (x == y - 1) ==> (x + 2 == y + 1)
+
+{-@ ax5 :: Int -> Int -> Int -> FALSE @-}
+ax5 x y z = (x <= 0 && x >= 0) ==> (y == x + z) ==> (y == z)
