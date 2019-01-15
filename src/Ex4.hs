@@ -27,3 +27,15 @@ head'' vec = if length vec > 0 then
         Just $ vec ! 0
     else
         Nothing
+
+-- exercise 4.2
+{-@ unsafeLookup :: idx:Nat -> {v:Vector a | idx < vlen v} -> a @-}
+unsafeLookup index vec = vec ! index
+
+-- exercise 4.3
+{-@ safeLookup :: Vector a -> Int -> Maybe a @-}
+safeLookup x i
+    | ok = Just (x ! i)
+    | otherwise = Nothing
+    where
+        ok = 0 <= i && i < length x

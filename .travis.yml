@@ -1,7 +1,6 @@
 dist: xenial
-language: cpp
-ghc:
-  - 8.4.3
+language: c
+
 cache:
   directories:
   - $HOME/.stack
@@ -20,3 +19,7 @@ addons:
   apt:
     packages:
     - z3
+    - cabal-install-head
+    - ghc-head
+    sources:
+    - hvr-ghc
