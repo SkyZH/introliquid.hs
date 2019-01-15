@@ -21,7 +21,7 @@ addons:
   apt:
     packages:
     - z3
-    - cabal-install-head
-    - ghc-head
+    - cabal-install-2.2
+    - ghc-8.4.3
     sources:
     - hvr-ghc
