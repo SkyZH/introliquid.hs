@@ -39,3 +39,28 @@ safeLookup x i
     | otherwise = Nothing
     where
         ok = 0 <= i && i < length x
+
+-- exercise 4.4
+vectorSum :: Vector Int -> Int
+vectorSum vec = go 0 0
+    where
+        go acc i
+            | i < sz = go (acc + (vec ! i)) (i + 1)
+            | otherwise = acc
+        sz = length vec
+
+-- exercise 4.5
+{-@ absoluteSum :: Vector Int -> Nat @-}
+absoluteSum :: Vector Int -> Int
+absoluteSum vec = absoluteSum' 0 0
+    where 
+        absoluteSum' acc i
+            | i < sz = absoluteSum'' acc i
+            | otherwise = acc
+            where
+                absoluteSum'' acc i = absoluteSum' (acc + current) (i + 1)
+                    where
+                        this_data = vec ! i
+                        current = if this_data < 0 then -this_data else this_data
+        sz = length vec
+
