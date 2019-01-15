@@ -1,18 +1,19 @@
 dist: xenial
-language: c
-
+language: haskell
+ghc:
+- 8.4.3
 cache:
   directories:
   - $HOME/.stack
+  - $HOME/.cabal
 before_install:
-  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - mkdir -p ~/.local/bin
   - export PATH=$HOME/.local/bin:$PATH
   - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 install:
-  - stack --no-terminal --skip-ghc-check setup
   - cabal update
   - cabal install liquidhaskell
+  - stack --no-terminal --skip-ghc-check setup
 script:
   - stack exec liquid src/Ex2.hs
   - stack exec liquid src/Ex3.hs
@@ -21,7 +22,3 @@ addons:
   apt:
     packages:
     - z3
-    - cabal-install-2.2
-    - ghc-8.4.3
-    sources:
-    - hvr-ghc
