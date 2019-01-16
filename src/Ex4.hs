@@ -64,7 +64,6 @@ vectorSum vec = go 0 0
             | otherwise = acc
         sz = length vec
 
-{-@ abz :: Int -> Nat @-}
 abz :: Int -> Int
 abz a = if a < 0 then (-a) else a
 
@@ -100,3 +99,11 @@ absoluteSum' vec = loop 0 n 0 body
   where
     body i acc   = acc + abz (vec ! i)
     n            = length vec
+
+-- exercise 4.8
+{-@ dotProduct :: x:Vector Int -> {y:Vector Int | vlen y == vlen x} -> Int @-}
+dotProduct :: Vector Int -> Vector Int -> Int
+dotProduct x y = loop 0 sz 0 body
+    where
+        sz = length x
+        body i acc= acc + (x ! i) * (y ! i)

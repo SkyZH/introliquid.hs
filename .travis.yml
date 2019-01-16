@@ -11,7 +11,7 @@ install:
   - git clone --recursive https://github.com/ucsd-progsys/liquidhaskell ~/liquidhaskell
   - cd ~/liquidhaskell && stack install
   - cd ${TRAVIS_BUILD_DIR}
-  - stack --no-terminal --skip-ghc-check setup
+  - stack --no-terminal --skip-ghc-check build
 script:
   - stack exec liquid src/Ex2.hs
   - stack exec liquid src/Ex3.hs
