@@ -1,7 +1,22 @@
-module Ex4 where
+{-@ LIQUID "--short-names"         @-}
+{-@ LIQUID "--no-termination"      @-}
+{-@ LIQUID "--scrape-used-imports" @-}
 
-import Prelude hiding (length)
-import Data.Vector
+module Ex4 (
+    head',
+    head'',
+    safeLookup,
+    unsafeLookup,
+    vectorSum,
+    absoluteSum,
+    vectorSum',
+    absoluteSum'
+) where
+
+import Prelude      hiding (head, abs, length)
+import Data.List    (foldl')
+import Data.Vector  hiding (head, foldl')
+
 
 {-@ type VectorN a N = {v: Vector a | vlen v == N } @-}
 
@@ -49,6 +64,10 @@ vectorSum vec = go 0 0
             | otherwise = acc
         sz = length vec
 
+{-@ abz :: Int -> Nat @-}
+abz :: Int -> Int
+abz a = if a < 0 then (-a) else a
+
 -- exercise 4.5
 {-@ absoluteSum :: Vector Int -> Nat @-}
 absoluteSum :: Vector Int -> Int
@@ -58,9 +77,26 @@ absoluteSum vec = absoluteSum' 0 0
             | i < sz = absoluteSum'' acc i
             | otherwise = acc
             where
-                absoluteSum'' acc i = absoluteSum' (acc + current) (i + 1)
-                    where
-                        this_data = vec ! i
-                        current = if this_data < 0 then -this_data else this_data
+                absoluteSum'' acc i = absoluteSum' (acc + abz (vec ! i)) (i + 1)
         sz = length vec
 
+loop :: Int -> Int -> a -> (Int -> a -> a) -> a
+loop lo hi base f =  go base lo
+    where
+        go acc i
+            | i < hi    = go (f i acc) (i + 1)
+            | otherwise = acc
+
+vectorSum'      :: Vector Int -> Int
+vectorSum' vec  = loop 0 n 0 body 
+    where
+        body i acc  = acc + (vec ! i)
+        n           = length vec
+
+-- exercise 4.7
+{-@ absoluteSum' :: Vector Int -> Int @-}
+absoluteSum' :: Vector Int -> Int
+absoluteSum' vec = loop 0 n 0 body
+  where
+    body i acc   = acc + abz (vec ! i)
+    n            = length vec
