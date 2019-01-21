@@ -3,6 +3,7 @@
 {-@ LIQUID "--scrape-used-imports" @-}
 module Ex42 (
     Sparse(..),
+    IncList(..),
     dotProd,
     dotProd',
     fromList,
@@ -10,12 +11,23 @@ module Ex42 (
     plus,
     test2,
     insert,
-    insertSort
+    insertSort,
+    insertSort',
+    merge,
+    split,
+    mergeSort,
+    BST(..),
+    mem,
+    add,
+    MinPair(..),
+    one,
+    delMin,
+    del
 ) where
 
 import Prelude      hiding (head, abs, length)
 import Data.List    (foldl')
-import Data.Vector  hiding (head, foldl', fromList, all, (++))
+import Data.Vector  hiding (head, foldl', fromList, all, (++), foldr)
 import Data.Maybe
 
 {-@ type Btwn Lo Hi = {v:Int | Lo <= v && v < Hi} @-}
@@ -84,11 +96,13 @@ test2 = plus vec1 vec2
 {-@ data IncList a = 
     Emp
   | (:<) { hd :: a, tl :: IncList { v:a | hd <= v }} @-}
+
+infixr 9 :<
 data IncList a =
     Emp
   | (:<) { hd :: a, tl :: IncList a }
+  deriving(Show)
 
-infixr 9 :<
 
 okList = 1 :< 2 :< 3 :< Emp
 
@@ -102,3 +116,91 @@ insert y (x :< xs)
     | y <= x = y :< x :< xs
     | otherwise = x :< insert y xs
 
+
+-- exercise 4.11
+insertSort' :: (Ord a) => [a] -> IncList a
+insertSort' xs = foldr f b xs
+    where
+        f x xs = insert x xs
+        b = Emp
+
+split :: [a] -> ([a], [a])
+split (x:y:zs) = (x:xs, y:ys)
+    where
+        (xs, ys) = split zs
+split xs = (xs, [])
+
+merge :: (Ord a) => IncList a -> IncList a -> IncList a
+merge Emp ys = ys
+merge xs Emp = xs
+merge (x :< xs) (y :< ys)
+    | x <= y    = x :< (merge xs (y :< ys))
+    | otherwise = y :< (merge (x :< xs) ys)
+merge _ _ = Emp
+
+mergeSort :: (Ord a) => [a] -> IncList a
+mergeSort [] = Emp
+mergeSort [x] = x :< Emp
+mergeSort xs = merge (mergeSort ys) (mergeSort zs)
+    where
+        (ys, zs) = split xs
+
+{-@ data BST a = Leaf
+               | Node { root :: a
+                      , left :: BSTL a root
+                      , right :: BSTR a root } @-}
+{-@ type BSTL a X = BST { v:a | v < X} @-}
+{-@ type BSTR a X = BST {v:a | X < v} @-}
+
+data BST a = Leaf
+           | Node { root :: a
+                  , left :: BST a
+                  , right :: BST a }
+
+okBST :: BST Int
+okBST = Node 6
+    (Node 2
+        (Node 1 Leaf Leaf)
+        (Node 4 Leaf Leaf))
+    (Node 9
+        (Node 7 Leaf Leaf)
+        Leaf)
+
+-- exercise 4.13
+-- no it can't
+
+
+mem :: (Ord a) => a -> BST a -> Bool
+mem _ Leaf = False
+mem k (Node k' l r)
+    | k == k' = True
+    | k < k'  = mem k l
+    | otherwise = mem k r
+
+one :: a -> BST a
+one x = Node x Leaf Leaf
+
+add :: (Ord a) => a -> BST a -> BST a
+add k' Leaf = one k'
+add k' t@(Node k l r)
+    | k' < k = Node k (add k' l) r
+    | k < k' = Node k l (add k' r)
+    | otherwise = t
+{-
+data MinPair a = MP { mElt :: a, rest :: BST a }
+{-@ data MinPair a = MP { mElt :: a, rest :: BSTR a mElt} @-}
+delMin :: (Ord a) => BST a -> MinPair a
+delMin (Node k Leaf r) = MP k r
+delMin (Node k l r) = MP k' (Node k l' r)
+    where
+        MP k' l' = delMin l
+delMin Leaf = die "Don't say I didn't warn ya!"
+
+del :: (Ord a) => a -> BST a -> BST a
+del k' t@(Node k l r) 
+    | k' /= k = t
+    | k' == k = Node re (del k' l) rt
+        where
+            MP re rt = delMin r
+del _ Leaf = Leaf
+-}
