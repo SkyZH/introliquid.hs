@@ -18,11 +18,7 @@ module Ex42 (
     mergeSort,
     BST(..),
     mem,
-    add,
-    MinPair(..),
-    one,
-    delMin,
-    del
+    add
 ) where
 
 import Prelude      hiding (head, abs, length)
