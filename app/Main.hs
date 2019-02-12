@@ -1,10 +1,11 @@
 module Main where
 
 import Lib
-import Ex2
-import Ex3
-import Ex4
-import Ex42
+import Ex02
+import Ex03
+import Ex041
+import Ex042
+import Ex05
 
 main :: IO ()
 main = someFunc
