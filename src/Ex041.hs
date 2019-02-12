@@ -2,7 +2,7 @@
 {-@ LIQUID "--no-termination"      @-}
 {-@ LIQUID "--scrape-used-imports" @-}
 
-module Ex4 (
+module Ex041 (
     head',
     head'',
     safeLookup,

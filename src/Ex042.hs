@@ -1,7 +1,7 @@
 {-@ LIQUID "--short-names"         @-}
 {-@ LIQUID "--no-termination"      @-}
 {-@ LIQUID "--scrape-used-imports" @-}
-module Ex42
+module Ex042
         ( Sparse(..)
         , IncList(..)
         , dotProd

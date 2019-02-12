@@ -13,10 +13,10 @@ install:
   - cd ${TRAVIS_BUILD_DIR}
   - stack --no-terminal --skip-ghc-check build
 script:
-  - stack exec liquid src/Ex2.hs
-  - stack exec liquid src/Ex3.hs
-  - stack exec liquid src/Ex4.hs
-  - stack exec liquid src/Ex42.hs
+  - stack exec liquid src/Ex02.hs
+  - stack exec liquid src/Ex03.hs
+  - stack exec liquid src/Ex041.hs
+  - stack exec liquid src/Ex042.hs
   - stack exec liquid src/Ex05.hs
 addons:
   apt:

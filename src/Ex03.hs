@@ -2,7 +2,7 @@
 {-@ LIQUID "--higherorder" @-}
 {-@ LIQUID "--no-termination" @-}
 
-module Ex3 where
+module Ex03 where
 
 {-@ type Zero = {v:Int | v == 0} @-}
 {-@ type NonZero = {v:Int | v /= 0} @-}

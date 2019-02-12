@@ -1,7 +1,7 @@
 {-@ LIQUID "--short-names" @-}
 {-@ LIQUID "--higherorder" @-}
 
-module Ex2 where
+module Ex02 where
 
 {-@ size  :: xs:[a] -> {v:Int | v = size xs} @-}
 {-@ invariant {v:[a] | size v >= 0} @-}
