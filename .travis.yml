@@ -18,6 +18,7 @@ script:
   - stack exec liquid src/Ex041.hs
   - stack exec liquid src/Ex042.hs
   - stack exec liquid src/Ex05.hs
+  - stack exec liquid src/Ex06.hs
 addons:
   apt:
     packages:
