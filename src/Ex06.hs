@@ -126,3 +126,36 @@ take'' n (x:xs) = x : take'' (n - 1) xs
 {-@ test5 :: [ListN String 2] @-}
 test5 = [ take'' 2 ["cat", "dog", "mouse"]
         , take'' 20 ["cow", "goat"]]
+
+{-@ predicate Sum2 X N = (size (fst X) + size (snd X) == N && len (fst X) + len(snd X) == N) @-}
+{-@ partition :: _ -> xs:_ -> {v:_ | Sum2 v (size xs)} @-}
+
+partition :: (a -> Bool) -> [a] -> ([a], [a])
+partition _ [] = ([], [])
+partition f (x:xs)
+  | f x = (x:ys, zs)
+  | otherwise = (ys, x:zs)
+  where
+    (ys, zs) = partition f xs
+
+{-@ pivApp :: a -> xs:[a] -> ys:[a] -> ListN a {size xs + size ys + 1} @-}
+pivApp piv [] ys = piv : ys
+pivApp piv (x:xs) ys = x : pivApp piv xs ys
+
+{-@ measure fst @-}
+{-@ measure snd @-}
+fst (x,_) = x
+snd (_,y) = y
+
+-- exercise 6.6
+{-@ quickSort' :: (Ord a) => xs:List a -> ListX a xs @-}
+quickSort' :: (Ord a) => [a] -> [a]
+quickSort' [] = []
+quickSort' (x:xs) = let
+  (l, r) = partition cmp xs
+  cmp t = t < x in
+    pivApp x l r
+
+{-@ test10 :: ListN String 2 @-}
+test10 :: [String]
+test10 = quickSort' test4
