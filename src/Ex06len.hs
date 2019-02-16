@@ -1,10 +1,10 @@
-module Ex06 where
+module Ex06len where
 
-{-@ measure size @-}
-{-@ size :: xs:[a] -> {v:Nat | v = size xs} @-}
-size :: [a] -> Int
-size [] = 0
-size (_:rs) = 1 + size rs
+{-@ measure len @-}
+{-@ len :: xs:[a] -> {v:Nat | v = len xs} @-}
+len :: [a] -> Int
+len [] = 0
+len (_:rs) = 1 + len rs
 
 {-@ measure notEmpty @-}
 notEmpty :: [a] -> Bool
@@ -39,8 +39,8 @@ for :: Vector a -> (a -> b) -> Vector b
 for (V n xs) f = V n (map f xs)
 
 type List a = [a]
-{-@ type ListN a N = {v:List a | size v = N} @-}
-{-@ type ListX a X = ListN a {size X} @-}
+{-@ type ListN a N = {v:List a | len v = N} @-}
+{-@ type ListX a X = ListN a {len X} @-}
 
 -- exercise 6.1
 
@@ -52,13 +52,13 @@ map1 _ [] = []
 map1 f (x:xs) = f x : map1 f xs
 
 {-@ prop_map :: List a -> TRUE @-}
-prop_map xs = size ys == size xs where
+prop_map xs = len ys == len xs where
   ys = map1 id xs
 
 -- exercise 6.2
 {-@ reverse :: xs: List a -> ListX a xs @-}
 reverse xs = go [] xs where
-  {-@ go :: left: List a -> right: List a -> ListN a {(size left) + (size right)} @-}
+  {-@ go :: left: List a -> right: List a -> ListN a {(len left) + (len right)} @-}
   go acc [] = acc
   go acc (x:xs) = go (x:acc) xs
 
@@ -75,26 +75,26 @@ zip1 (a:as) (b:bs) = (a, b): zip1 as bs
 zip1 [] _ = []
 zip1 _ [] = []
 
-{-@ predicate Tinier X Y Z = Min (size X) (size Y) (size Z) @-}
+{-@ predicate Tinier X Y Z = Min (len X) (len Y) (len Z) @-}
 {-@ predicate Min X Y Z = (if Y < Z then X = Y else X = Z) @-}
 
 -- exercise 6.3
 {-@ zipOrNull :: xs: List a ->
-    {ys: List b | (size xs /= 0 && size ys /= 0) => (size xs == size ys)} ->
-    {v:List (a, b) | if (size xs == size ys) then (size v == size xs) else (size v == 0)} @-}
+    {ys: List b | (len xs /= 0 && len ys /= 0) => (len xs == len ys)} ->
+    {v:List (a, b) | if (len xs == len ys) then (len v == len xs) else (len v == 0)} @-}
 
 zipOrNull :: [a] -> [b] -> [(a, b)]
 zipOrNull [] _ = []
 zipOrNull _ [] = []
 zipOrNull xs ys = zipWith1 (,) xs ys
 
-{-@ test1 :: {v: _ | size v = 2} @-}
+{-@ test1 :: {v: _ | len v = 2} @-}
 test1 = zipOrNull [0, 1] [True, False]
 
-{-@ test2 :: {v: _ | size v = 0} @-}
+{-@ test2 :: {v: _ | len v = 0} @-}
 test2 = zipOrNull [] [True, False]
 
-{-@ test3 :: {v: _ | size v = 0} @-}
+{-@ test3 :: {v: _ | len v = 0} @-}
 test3 = zipOrNull ["cat", "dog"] []
 
 
@@ -104,10 +104,10 @@ take' 0 _ = []
 take' n (x:xs) = x : take' (n - 1) xs
 take' _ _ = die "won't happen"
 
-{-@ type ListGE a N = {v:List a | N <= size v} @-}
+{-@ type ListGE a N = {v:List a | N <= len v} @-}
 
 -- exercise 6.4
-{-@ drop' :: n:Nat -> xs:ListGE a n -> ListN a {size xs - n} @-}
+{-@ drop' :: n:Nat -> xs:ListGE a n -> ListN a {len xs - n} @-}
 drop' :: Int -> [a] -> [a]
 drop' 0 xs = xs
 drop' n (_:xs) = drop' (n - 1) xs
@@ -117,7 +117,7 @@ drop' _ _ = die "won't happen"
 test4 = drop' 1 ["cat", "dog", "mouse"]
 
 -- exercise 6.5
-{-@ take'' :: n:Nat -> xs:List a -> ListN a {if n < (size xs) then n else (size xs)}@-}
+{-@ take'' :: n:Nat -> xs:List a -> ListN a {if n < (len xs) then n else (len xs)}@-}
 take'' :: Int -> [a] -> [a]
 take'' 0 _ = []
 take'' _ [] = []
@@ -127,8 +127,8 @@ take'' n (x:xs) = x : take'' (n - 1) xs
 test5 = [ take'' 2 ["cat", "dog", "mouse"]
         , take'' 20 ["cow", "goat"]]
 
-{-@ predicate Sum2 X N = size (fst X) + size (snd X) = N @-}
-{-@ partition :: _ -> xs:_ -> {v:_ | Sum2 v (size xs)} @-}
+{-@ predicate Sum2 X N = len (fst X) + len (snd X) = N @-}
+{-@ partition :: _ -> xs:_ -> {v:_ | Sum2 v (len xs)} @-}
 
 partition :: (a -> Bool) -> [a] -> ([a], [a])
 partition _ [] = ([], [])
@@ -138,7 +138,7 @@ partition f (x:xs)
   where
     (ys, zs) = partition f xs
 
-{-@ pivApp :: a -> xs:[a] -> ys:[a] -> ListN a {size xs + size ys + 1} @-}
+{-@ pivApp :: a -> xs:[a] -> ys:[a] -> ListN a {len xs + len ys + 1} @-}
 pivApp piv [] ys = piv : ys
 pivApp piv (x:xs) ys = x : pivApp piv xs ys
 
