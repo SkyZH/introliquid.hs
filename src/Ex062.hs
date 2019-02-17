@@ -1,14 +1,14 @@
 module Ex062 where
 
-{-@ measure size @-}
-{-@ size :: xs:[a] -> {v:Nat | v = size xs} @-}
-size :: [a] -> Int
-size [] = 0
-size (_:rs) = 1 + size rs
+{-@ measure len @-}
+{-@ len :: xs:[a] -> {v:Nat | v = len xs} @-}
+len :: [a] -> Int
+len [] = 0
+len (_:rs) = 1 + len rs
 
 type List a = [a]
-{-@ type ListN a N = {v:List a | size v = N} @-}
-{-@ type ListX a X = ListN a {size X} @-}
+{-@ type ListN a N = {v:List a | len v = N} @-}
+{-@ type ListX a X = ListN a {len X} @-}
 
 {-@ data Vector a = V { vDim :: Nat
                       , vElts :: ListN a vDim }@-}
@@ -63,10 +63,74 @@ zipWith1 _ _ _ = die "no other cases"
 dotProduct x y = sum $ vElts $ vBin (*) x y
 
 -- exercise 6.7
-{-@ vecFromList :: xs:List a -> VectorN a {size xs} @-}
+{-@ vecFromList :: xs:List a -> VectorN a {len xs} @-}
 vecFromList :: List a -> Vector a
-vecFromList xs = V (size xs) xs
+vecFromList xs = V (len xs) xs
 
 test6 = dotProduct vx vy where
   vx = vecFromList [1,2,3]
   vy = vecFromList [4,5,6]
+
+{-@ flatten :: n:Nat -> m:Nat -> VectorN (VectorN a m) n -> VectorN a {m * n} @-}
+flatten n m v = V (n * m) (flatten' (vElts v)) where
+  {-@ flatten' :: xs:[VectorN a m] -> ListN a {m * (len xs)} @-}
+  flatten' :: [Vector a] -> [a]
+  flatten' (v:vs) = vElts v ++ flatten' vs
+  flatten' _ = []
+
+{-@ product :: xs:Vector _ -> ys:Vector _ -> VectorN _ {vDim xs * vDim ys} @-}
+product xs ys = flatten (vDim ys) (vDim xs) xys where
+  xys = for ys $ \y ->
+    for xs $ \x -> x * y
+
+{-@ data Matrix a =
+    M { mRow :: Pos
+      , mCol :: Pos
+      , mElts :: VectorN (VectorN a mCol) mRow
+      }
+@-}
+
+{-@ type Pos = {v:Int | 0 < v} @-}
+
+data Matrix a = M { mRow :: Int
+                  , mCol :: Int
+                  , mElts :: Vector (Vector a)
+                  }
+
+{-@ type MatrixN a R C = {v:Matrix a | Dims v R C} @-}
+{-@ predicate Dims M R C = mRow M = R && mCol M = C @-}
+
+{-@ ok23 :: MatrixN _ 2 3 @-}
+ok23 = M 2 3 (V 2 [ V 3 [1, 2, 3]
+                  , V 3 [4, 5, 6] ])
+
+-- exercise 6.10
+{-
+{-@ matFromList :: n:[[a]] -> Maybe ({m:Matrix a | mRow m == len n}) @-}
+matFromList :: [[a]] -> Maybe (Matrix a)
+matFromList [] = Nothing
+matFromList xss@(xs:_)
+  | ok = let
+      vs = V r vcol
+      vcol = map' (\x -> V c x) xss 
+      in Just $ M r c vs 
+  | otherwise = Nothing where
+      r = len xss
+      c = len xs
+      ok = r > 0 && c > 0 && all' (\x -> len x == c) xss
+
+{-@ map' :: (a -> b) -> xs:List a -> ListX b xs @-}
+map' :: (a -> b) -> [a] -> [b]
+map' f (x:xs) = f x : map' f xs
+map' _ _ = []
+
+{-@ all' :: (a -> Bool) -> [a] -> Bool @-}
+all' :: (a -> Bool) -> [a] -> Bool
+all' f (x:xs) = f x && all' f xs
+all' _ _ = True
+
+{-@ mat23 :: Maybe (MatrixN Int 2 2) @-}
+mat23 :: Maybe (Matrix Int)
+mat23 = matFromList [[1,2], [3,4]]
+-}
+

@@ -91,3 +91,4 @@ truncate i max
     where
         i' = abs' i
         max' = abs' max
+

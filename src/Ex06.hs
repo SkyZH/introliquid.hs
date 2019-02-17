@@ -1,7 +1,7 @@
 module Ex06 where
 
 {-@ measure size @-}
-{-@ size :: xs:[a] -> {v:Nat | v = size xs} @-}
+{-@ size :: xs:_ -> {v:Nat | v = len xs} @-}
 size :: [a] -> Int
 size [] = 0
 size (_:rs) = 1 + size rs
@@ -154,7 +154,7 @@ quickSort' [] = []
 quickSort' (x:xs) = let
   (l, r) = partition cmp xs
   cmp t = t < x in
-    pivApp x l r
+    l ++ [x] ++ r
 
 {-@ test10 :: ListN String 2 @-}
 test10 :: [String]
