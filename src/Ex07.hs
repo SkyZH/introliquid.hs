@@ -1,9 +1,5 @@
 module Ex07 where
 
-import Data.Set hiding (insert, partition, filter, split, elems)
-import Prelude  hiding (elem, reverse, filter)
-
-
 {-@ type True = {v:Bool | v} @-}
 {-@ type False = {v:Bool | not v} @-}
 
