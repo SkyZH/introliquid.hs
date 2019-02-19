@@ -105,15 +105,14 @@ ok23 = M 2 3 (V 2 [ V 3 [1, 2, 3]
                   , V 3 [4, 5, 6] ])
 
 -- exercise 6.10
-{-
-{-@ matFromList :: n:[[a]] -> Maybe ({m:Matrix a | mRow m == len n}) @-}
+
 matFromList :: [[a]] -> Maybe (Matrix a)
 matFromList [] = Nothing
 matFromList xss@(xs:_)
   | ok = let
       vs = V r vcol
-      vcol = map' (\x -> V c x) xss 
-      in Just $ M r c vs 
+      vcol = map' (\x -> V c x) xss
+      in Just $ M r c vs
   | otherwise = Nothing where
       r = len xss
       c = len xs
@@ -132,5 +131,5 @@ all' _ _ = True
 {-@ mat23 :: Maybe (MatrixN Int 2 2) @-}
 mat23 :: Maybe (Matrix Int)
 mat23 = matFromList [[1,2], [3,4]]
--}
+
 

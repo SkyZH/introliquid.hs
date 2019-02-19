@@ -154,7 +154,7 @@ quickSort' [] = []
 quickSort' (x:xs) = let
   (l, r) = partition cmp xs
   cmp t = t < x in
-    l ++ [x] ++ r
+    pivApp x l r
 
 {-@ test10 :: ListN String 2 @-}
 test10 :: [String]
