@@ -48,7 +48,7 @@ elts (x:xs) = singleton x `union` elts xs
 {-@ type ListS a S = {v:[a] | elts v = S} @-}
 {-@ type ListEmp a = ListS a {Set_empty 0} @-}
 {-@ type ListEq a X = ListS a {elts X} @-}
-{-@ type ListSub a X = {v:[a] | Set_sub (elts v (elts X))} @-}
+{-@ type ListSub a X = {v:[a] | Set_sub (elts v) (elts X)} @-}
 {-@ type ListUn a X Y = ListS a {Set_cup (elts X) (elts Y)} @-}
 {-@ type ListUn1 a X Y = ListS a {Set_cup (Set_sng X) (elts Y)} @-}
 
@@ -64,3 +64,76 @@ reverse' xs = revHelper [] xs where
   {-@ revHelper :: xs:List a -> ys:List a -> ListUn a xs ys @-}
   revHelper acc [] = acc
   revHelper acc (x:xs) = revHelper (x:acc) xs
+
+-- exercise 7.5
+
+{-@ elem' :: (Eq a) => x:a -> xs:[a] -> {v:Bool | v <=> Set_mem x (elts xs)} @-}
+elem' x (y:ys) = x == y || elem' x ys
+elem' _ [] = False
+
+{-@ test1 :: True @-}
+test1 = elem' 2 [1, 2, 3]
+
+{-@ test2 :: False @-}
+test2 = elem' 2 [1, 3]
+
+insert x [] = [x]
+insert x (y:ys)
+  | x <= y = x : y : ys
+  | otherwise = y : insert x ys
+{-@ insert :: x:a -> xs:List a -> ListUn1 a x xs @-}
+
+{-@ insertSort :: (Ord a) => xs:List a -> ListEq a xs @-}
+insertSort [] = []
+insertSort (x:xs) = insert x (insertSort xs)
+
+{-@ measure unique @-}
+unique :: (Ord a) => List a -> Bool
+unique [] = True
+unique (x:xs) = unique xs && not (member x (elts xs))
+
+{-@ type UList a = {v:List a | unique v} @-}
+{-@ isUnique :: UList Int @-}
+isUnique :: [Int]
+isUnique = [1, 2, 3]
+ 
+
+{-@ filter' :: (a -> Bool) -> xs:UList a -> {v:ListSub a xs | unique v} @-}
+
+filter' _ [] = []
+filter' f (x:xs)
+  | f x = x : xs'
+  | otherwise = xs' where
+      xs' = filter' f xs
+
+-- exercise 7.8
+{-@ filter'' :: (a -> Bool) -> xs:List a -> {v:ListSub a xs | unique xs => unique v} @-}
+filter'' _ [] = []
+filter'' f (x:xs)
+  | f x = x : xs'
+  | otherwise = xs' where
+      xs' = filter'' f xs
+
+{-@ test3 :: UList _ @-}
+test3 :: [Int]
+test3 = filter'' (> 2) [1, 2, 3, 4]
+
+{-@ test4 :: [_] @-}
+test4 :: [Int]
+test4 = filter'' (> 3) [3, 1, 2, 3]
+
+{-@ nub :: List a -> UList a @-}
+nub xs = go [] xs where
+  go seen [] = seen
+  go seen (x:xs)
+    | x `isin` seen = go seen xs
+    | otherwise = go (x:seen) xs
+
+{-@ predicate In X Xs = Set_mem X (elts Xs) @-}
+
+{-@ isin :: x:_ -> ys:_ -> {v:Bool | v <=> In x ys} @-}
+isin x (y:ys)
+  | x == y = True
+  | otherwise = x `isin` ys
+
+isin _ [] = False
