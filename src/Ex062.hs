@@ -105,7 +105,7 @@ ok23 = M 2 3 (V 2 [ V 3 [1, 2, 3]
                   , V 3 [4, 5, 6] ])
 
 -- exercise 6.10
-
+{-
 matFromList :: [[a]] -> Maybe (Matrix a)
 matFromList [] = Nothing
 matFromList xss@(xs:_)
@@ -131,5 +131,5 @@ all' _ _ = True
 {-@ mat23 :: Maybe (MatrixN Int 2 2) @-}
 mat23 :: Maybe (Matrix Int)
 mat23 = matFromList [[1,2], [3,4]]
-
+-}
 
